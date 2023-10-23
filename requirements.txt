@@ -1,0 +1,10 @@
+torch
+timm
+torchvision
+numpy
+dataclasses
+PIL
+tqdm
+scipy
+seaborn
+matplotlib

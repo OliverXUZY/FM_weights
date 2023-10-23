@@ -3,7 +3,6 @@ import random
 import numpy as np
 import torch.nn.functional as F
 
-from .metrics import ranks_and_explained_ratios_and_relative_norm
 
 def set_random_seed(seed_value=42):
     """

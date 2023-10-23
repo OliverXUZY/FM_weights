@@ -4,7 +4,6 @@ import random
 import argparse
 import os
 
-import sys
 from src import get_sets
 
 def parse_args():
