@@ -6,18 +6,16 @@ conda create --name FM_weights python==3.9
 conda activate FM_weights
 pip install -r requirements.txt
 ```
-## Get Embeddings 
-### Generate Embeddings
-**Generate $\{h_{c,t}\}$**
-```
-python generate_pos_ctx.py --data_root /Users/zyxu/Documents/py/datasets --output_path output
-```
+## Generate/Load Embeddings 
 
-**Datasets**
+### Generate Embeddings
+
+**Get TieredImageNet**
 - [tieredImageNet](https://drive.google.com/open?id=1nVGCTd9ttULRXFezh4xILQ9lUkg0WZCG) (courtesy of [Kwonjoon Lee](https://github.com/kjunelee/MetaOptNet))
 
 **Local Data Directory**
-Download and extract data into `data_root` like below, in my case `data_root = /Users/zyxu/Documents/py/datasets`
+
+Download and extract data into `data_root` like below. For exmaple: `data_root = /Users/zyxu/Documents/py/datasets`
 ```
 tiered_imagenet
 ├── tiered-imagenet-kwon
@@ -27,8 +25,16 @@ tiered_imagenet
 │   ├── train_labels.pkl
 │   ├── val_images.npz
 │   └── val_labels.pkl
-
 ```
+
+**Generate $\{h_{c,t}\}$**
+
+Modify data_root accordingly
+```
+python generate_pos_ctx.py --data_root /Users/zyxu/Documents/py/datasets --output_path output
+```
+
+
 ### Load Embeddings
 Alternatively, you can download embeddings into `output/` from here: [4sets_intermediate_outputs.pth](https://drive.google.com/file/d/1ozlyHvSreweNpRQsDnsvdu5MiMkm_ZrS/view?usp=share_link)
 
