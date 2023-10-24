@@ -1,5 +1,6 @@
 import torch
 import timm
+from pprint import pprint
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse

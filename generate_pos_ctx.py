@@ -4,6 +4,7 @@ import random
 import argparse
 import os
 
+import sys
 from src import get_sets
 
 def parse_args():
@@ -124,7 +125,10 @@ def main():
   if not os.path.exists(args.output_path):
     os.makedirs(args.output_path)
 
-  torch.save(intermediate_outputs, 'output/4sets_intermediate_outputs.pth')
+  if os.path.exists(f'{args.output_path}/4sets_intermediate_outputs.pth'):
+    print("existing, skip saving!")
+  else:
+    torch.save(intermediate_outputs, f'{args.output_path}/4sets_intermediate_outputs.pth')
 
 
 if __name__ == "__main__":
