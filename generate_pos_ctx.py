@@ -96,10 +96,10 @@ def main():
   '''
 
   sets = {}
-  
+  SEED = 123
   # Set the random seed
   rnd = random.Random()
-  rnd.seed(42)
+  rnd.seed(SEED)
 
 
   batch = []
@@ -108,6 +108,9 @@ def main():
     # print("========= name is: ", dataset_name)
     sets[dataset_name] = get_sets(dataset_name, data_root = args.data_root)
     data_tensor, targets_tensor = get_random_batch(sets[dataset_name], batch_size=64,rnd = rnd)
+    # print(f"zhuoyan data_tensor.shape {data_tensor.shape}")
+    # print(data_tensor[0][0])
+    # assert False
     
     batch.append(data_tensor)
   
@@ -125,10 +128,10 @@ def main():
   if not os.path.exists(args.output_path):
     os.makedirs(args.output_path)
 
-  if os.path.exists(f'{args.output_path}/4sets_intermediate_outputs.pth'):
+  if os.path.exists(f'{args.output_path}/{SEED}_4sets_intermediate_outputs.pth'):
     print("existing, skip saving!")
   else:
-    torch.save(intermediate_outputs, f'{args.output_path}/4sets_intermediate_outputs.pth')
+    torch.save(intermediate_outputs, f'{args.output_path}/{SEED}_4sets_intermediate_outputs.pth')
 
 
 if __name__ == "__main__":
