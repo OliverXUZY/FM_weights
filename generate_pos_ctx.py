@@ -103,7 +103,10 @@ def main():
 
 
   batch = []
-  names = ["Cifar10", "DTD", "STL10", "tieredImageNet"]
+  # names = ["Cifar10", "DTD", "STL10", "tieredImageNet"]
+  names = ["Cifar10", "DTD", "STL10"]
+  
+  file_name = f'{SEED}_3sets_intermediate_outputs.pth'
   for dataset_name in names:
     # print("========= name is: ", dataset_name)
     sets[dataset_name] = get_sets(dataset_name, data_root = args.data_root)
@@ -128,10 +131,10 @@ def main():
   if not os.path.exists(args.output_path):
     os.makedirs(args.output_path)
 
-  if os.path.exists(f'{args.output_path}/{SEED}_4sets_intermediate_outputs.pth'):
+  if os.path.exists(f'{args.output_path}/{file_name}'):
     print("existing, skip saving!")
   else:
-    torch.save(intermediate_outputs, f'{args.output_path}/{SEED}_4sets_intermediate_outputs.pth')
+    torch.save(intermediate_outputs, f'{args.output_path}/{file_name}')
 
 
 if __name__ == "__main__":
