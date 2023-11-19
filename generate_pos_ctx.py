@@ -7,11 +7,19 @@ import os
 import sys
 from src import get_sets
 
+model = {
+  "vit_small_in1k": "vit_small_patch16_224.augreg_in1k",
+  "vit_small_in21k": "vit_small_patch16_224.augreg_in21k_ft_in1k",
+  "vit_tiny_in21k": "vit_tiny_patch16_224.augreg_in21k",
+  "vit_tiny_patch16_384_in21k": "vit_tiny_patch16_384_in21k"
+}
+
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default="vit_tiny_patch16_384")
+    parser.add_argument("--model_card", type=str, default="vit_tiny_patch16_384.augreg_in21k_ft_in1k")
     parser.add_argument("--data_root", type=str, default="/Users/zyxu/Documents/py/datasets")
-    parser.add_argument("--output_path", type=str, default="output")
+    parser.add_argument("--output_path", type=str, default="output/vit_tiny_in21k")
+    parser.add_argument("--seed", type=int, default=37)
 
     return parser.parse_args()
 
@@ -71,7 +79,8 @@ def get_random_batch(dataset, batch_size, rnd):
 
 def main():
   args = parse_args()
-  model = timm.create_model(args.model, img_size=224,pretrained=True)
+  model = timm.create_model(f"timm/{args.model_card}", img_size=224,pretrained=True)
+  
 
   intermediate_outputs = _add_hooks(model)
 
@@ -96,17 +105,17 @@ def main():
   '''
 
   sets = {}
-  SEED = 123
+  SEED = args.seed if args.seed else 37
   # Set the random seed
   rnd = random.Random()
   rnd.seed(SEED)
 
 
   batch = []
-  # names = ["Cifar10", "DTD", "STL10", "tieredImageNet"]
-  names = ["Cifar10", "DTD", "STL10"]
+  names = ["Cifar10", "DTD", "STL10", "tieredImageNet"]
+  # names = ["Cifar10", "DTD", "STL10"]
   
-  file_name = f'{SEED}_3sets_intermediate_outputs.pth'
+  file_name = f'{SEED}_4sets_intermediate_outputs.pth'
   for dataset_name in names:
     # print("========= name is: ", dataset_name)
     sets[dataset_name] = get_sets(dataset_name, data_root = args.data_root)
