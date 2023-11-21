@@ -73,7 +73,11 @@ def intermdiates_to_pos_ctx(h_total, normalize = True, verbose = True):
     return retval
 
 
-
+def determine_layout(num_plots):
+    # You can define your own logic for how many rows and columns you want
+    nrows = int(np.sqrt(num_plots))
+    ncols = (num_plots + nrows - 1) // nrows  # Ensuring enough columns
+    return nrows, ncols
 
 
 

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
-
+from . import determine_layout
 
 n_plot_seq = 1
 nrows, ncols = 2, 6
@@ -125,14 +125,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-def determine_layout(num_plots):
-    # You can define your own logic for how many rows and columns you want
-    nrows = int(np.sqrt(num_plots))
-    ncols = (num_plots + nrows - 1) // nrows  # Ensuring enough columns
-    return nrows, ncols
 
 
-def plot1D(pos, save_to=None, point_size = 8, largeLM = None):
+
+def plot1D(pos, save_to=None, point_size = 8, largeLN = None, id_PC = 0):
     PC = {}
     L, T, C = pos.shape
 
@@ -153,7 +149,8 @@ def plot1D(pos, save_to=None, point_size = 8, largeLM = None):
 
         # apply PCA
         u, s, vt = np.linalg.svd(p)
-        proj_mat = vt[:1, :].T  # Taking the first PC only
+        proj_mat = vt[[id_PC], :].T  # Taking the first PC only
+        # proj_mat = vt[:1, :].T  # Taking the first PC only
         PC[layer_idx] = proj_mat[:, 0]
 
 
@@ -165,9 +162,9 @@ def plot1D(pos, save_to=None, point_size = 8, largeLM = None):
         ax.scatter(x_axis, proj_mat[:, 0], label="pos", s = point_size)  # Plotting raw values on the first PC
         ax.vlines(x_axis, ymin=0, ymax=proj_mat[:, 0], alpha=0.5)
 
-        if largeLM is not None:
-            # Draw vertical lines based on largeLM dictionary
-            for index in largeLM.get(layer_idx, []):
+        if largeLN is not None:
+            # Draw vertical lines based on largeLN dictionary
+            for index in largeLN.get(layer_idx, []):
                 ax.axvline(x=index, color='r', linestyle='--', lw=0.5)  # Adding a vertical line
 
         ax.set_title(f"Layer: {layer_idx}", weight="bold", fontsize=30)
@@ -185,7 +182,9 @@ def plot1D(pos, save_to=None, point_size = 8, largeLM = None):
 
 
 
-def plotLayerNorm(model, save_to=None, point_size = 8, norm_option = "attention", para_option = "weight"):
+def plotLayerNorm(model, save_to=None, point_size = 8, 
+                  norm_option = "attention", para_option = "weight", 
+                  indices = None, add_vlines = True):
     weight = {}
     bias = {}
     selected_layers = range(12)
@@ -224,7 +223,14 @@ def plotLayerNorm(model, save_to=None, point_size = 8, norm_option = "attention"
         # ax.scatter(pc[:, 0], np.zeros_like(pc[:, 0]), c=colors_blue, label="pos")  # Plotting on the first PC only
         x_axis = np.arange(1, para.shape[0] + 1)  # x-axis from 1 to number of data points
         ax.scatter(x_axis, para, label="pos", s = point_size)  # Plotting raw values on the first PC
-        ax.vlines(x_axis, ymin=0, ymax=para, alpha=0.5)
+        if add_vlines:
+            ax.vlines(x_axis, ymin=0, ymax=para, alpha=0.5)
+
+        if indices is not None:
+            # Draw vertical lines based on largeLN dictionary
+            for index in indices.get(layer_idx+1, []):
+                ax.axvline(x=index, color='r', linestyle='--', lw=0.5)  # Adding a vertical line
+
 
         ax.set_title(f"Layer: {layer_idx + 1}", weight="bold", fontsize=30)
 
@@ -238,3 +244,51 @@ def plotLayerNorm(model, save_to=None, point_size = 8, norm_option = "attention"
         plt.show()
     
     return weight, bias
+
+
+def plot2D(pos, save_to=None, point_size = 8, largeLN = None):
+    PC = {}
+    L, T, C = pos.shape
+
+    
+    selected_layers = range(1,L)
+
+    nrows, ncols = determine_layout(len(selected_layers))  # Define how you want to layout your subplots
+
+    fig, axs = plt.subplots(nrows, ncols, figsize=(4 * ncols, 4 * nrows), dpi=100)
+
+    for subplot_idx, layer_idx in enumerate(tqdm(selected_layers, desc="Layer progress")):
+        rdx, cdx = subplot_idx // ncols, subplot_idx % ncols
+        p = pos[layer_idx]
+
+        # apply PCA
+        u, s, vt = np.linalg.svd(p)
+        proj_mat = vt[:2, :].T  # Taking the first 2 PCs only
+        PC[layer_idx] = proj_mat
+
+
+        # colors_blue = [plt.cm.Blues(x) for x in np.linspace(0.3, 1, C)]
+
+        ax = axs[rdx, cdx]
+        # ax.scatter(pc[:, 0], np.zeros_like(pc[:, 0]), c=colors_blue, label="pos")  # Plotting on the first PC only
+        ax.scatter(proj_mat[:, 0], proj_mat[:, 1], label="pos", s = point_size)  # Plotting raw values on the first PC
+
+        if largeLN is not None:
+            for index in largeLN.get(layer_idx, []):
+                ax.scatter(proj_mat[index, 0], proj_mat[index, 1], color='r', s=point_size, marker = "o", alpha = 0.7, zorder=3)  # Emphasize the point
+
+
+
+        ax.set_title(f"Layer: {layer_idx}", weight="bold", fontsize=30)
+        ax.set_xlabel('PC1')
+        ax.set_ylabel('PC2')
+
+    fig.tight_layout()
+
+    if save_to is not None:
+        plt.savefig(save_to, bbox_inches="tight")
+        plt.close()
+    else:
+        plt.show()
+    
+    return PC
